@@ -13,10 +13,7 @@ mongoose.connect('mongodb+srv://jessicalouvel:myrTnIWUm8KKVpmY@cluster0.4pt78ld.
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
-  const app = express();
-
-
-
+const app = express();
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
