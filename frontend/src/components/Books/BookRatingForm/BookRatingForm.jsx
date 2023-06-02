@@ -25,7 +25,7 @@ function BookRatingForm({
       setRating(parseInt(rate, 10));
       formState.dirtyFields.rating = false;
     }
-  }, [formState]);
+  }, );
   const onSubmit = async () => {
     if (!connectedUser || !auth) {
       navigate(APP_ROUTES.SIGN_IN);

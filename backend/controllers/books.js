@@ -10,58 +10,58 @@ exports.createBook = (req, res, next) => {
         userId: req.auth.userId,
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
-  
-    book.save()
-    .then(() => { res.status(201).json({message: 'Objet enregistré !'})})
-    .catch(error => { res.status(400).json( { error })})
- };
 
- exports.getOneBook = (req, res, next) => {
-    Book.findOne({ _id: req.params.id })
-        .then((thing) => {res.status(200).json(thing);})
-        .catch((error) => {res.status(404).json({error: error});});
+    book.save()
+        .then(() => { res.status(201).json({ message: 'Objet enregistré !' }) })
+        .catch(error => { res.status(400).json({ error }) })
 };
 
- exports.modifyBook = (req, res, next) => {
+exports.getOneBook = (req, res, next) => {
+    Book.findOne({ _id: req.params.id })
+        .then((book) => { res.status(200).json(book); })
+        .catch((error) => { res.status(404).json({ error: error }); });
+};
+
+exports.modifyBook = (req, res, next) => {
     const bookObject = req.file ? {
         ...JSON.parse(req.body.book),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
-  
+
     delete bookObject._userId;
-    Book.findOne({_id: req.params.id})
+    Book.findOne({ _id: req.params.id })
         .then((book) => {
             if (book.userId != req.auth.userId) {
-                res.status(401).json({ message : 'Not authorized'});
+                res.status(401).json({ message: 'Not authorized' });
             } else {
-                Book.updateOne({ _id: req.params.id}, { ...bookObject, _id: req.params.id})
-                .then(() => res.status(200).json({message : 'Objet modifié!'}))
-                .catch(error => res.status(401).json({ error }));
+                Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
+                    .then(() => res.status(200).json({ message: 'Objet modifié!' }))
+                    .catch(error => res.status(401).json({ error }));
             }
         })
         .catch((error) => {
             res.status(400).json({ error });
         });
- };
+};
 
- exports.deleteBook = (req, res, next) => {
-    Book.findOne({ _id: req.params.id})
+exports.deleteBook = (req, res, next) => {
+    Book.findOne({ _id: req.params.id })
         .then(book => {
             if (book.userId != req.auth.userId) {
-                res.status(401).json({message: 'Not authorized'});
+                res.status(401).json({ message: 'Not authorized' });
             } else {
                 const filename = book.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
-                    Book.deleteOne({_id: req.params.id})
-                        .then(() => { res.status(200).json({message: 'Objet supprimé !'})})
+                    Book.deleteOne({ _id: req.params.id })
+                        .then(() => { res.status(200).json({ message: 'Objet supprimé !' }) })
                         .catch(error => res.status(401).json({ error }));
                 });
             }
         })
-        .catch( error => {
+        .catch(error => {
             res.status(500).json({ error });
         });
- };
+};
 
 exports.getAllBooks = (req, res, next) => {
     Book.find()
@@ -73,11 +73,30 @@ exports.getBestRate = (req, res, next) => {
     //https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/read-operations/sort/
     //https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/read-operations/limit/
     Book.find().sort({ averageRating: -1 }).limit(3)
-    .then(books => res.status(200).json(books))
-    .catch(error => res.status(400).json({ error }));
+        .then(books => res.status(200).json(books))
+        .catch(error => res.status(400).json({ error }));
 };
 
-exports.rateBook = (req, res, next) => {
-  
+exports.rateBook = (req, res) => {
+    Book.findOne({ _id: req.params.id })
+        .then(book => {
+            //push le userId et le grade dans le tableau rattings de l'objet book
+            book.ratings.push({
+                userId: req.auth.userId,
+                grade: req.body.rating
+            });
+            let sumGrades = 0
+            //pour chaque index du tableau ratings, on récupère la 'grade' et on l'ajoute à la somme des notes
+            for (let i = 0; i < book.ratings.length; i++) {
+                let indexGrade = book.ratings[i].grade;
+                sumGrades += indexGrade;
+            }
+            //on actualise la note moyenne en divisant la somme des notes par le nombre de notes dispo dans le tableau
+            book.averageRating = sumGrades / book.ratings.length;
+            return book.save();
+
+        })
+        .then((book) => { res.status(200).json(book); })
+        .catch((error) => { res.status(404).json({ error: error }); });
 
 };

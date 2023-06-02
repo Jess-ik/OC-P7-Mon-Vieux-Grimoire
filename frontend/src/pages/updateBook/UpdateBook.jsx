@@ -20,7 +20,7 @@ function UpdateBook() {
         navigate(APP_ROUTES.SIGN_IN);
       }
     }
-  }, [userLoading]);
+  }, );
   useEffect(() => {
     async function getItem() {
       const data = await getBook(params.id);
@@ -29,7 +29,7 @@ function UpdateBook() {
       }
     }
     getItem();
-  }, []);
+  }, );
 
   return (
     <div className="content-container">
