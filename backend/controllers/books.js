@@ -70,8 +70,8 @@ exports.getAllBooks = (req, res, next) => {
 };
 
 exports.getBestRate = (req, res, next) => {
-    //https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/read-operations/sort/
-    //https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/read-operations/limit/
+    //https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/read-operations/sort/ pour ranger les notes par ordre décroissant
+    //https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/read-operations/limit/ pour prendre les 3e 
     Book.find().sort({ averageRating: -1 }).limit(3)
         .then(books => res.status(200).json(books))
         .catch(error => res.status(400).json({ error }));
