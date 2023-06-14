@@ -13,7 +13,7 @@ exports.createBook = (req, res, next) => {
 
     book.save()
         .then(() => { res.status(201).json({ message: 'Objet enregistré !' }) })
-        .catch(error => { res.status(400).json({ error }) })
+        .catch(error => { res.status(400).json({ message: 'Vérifiez que tous les champs sont corretement remplis' }) })
 };
 
 exports.getOneBook = (req, res, next) => {
@@ -43,6 +43,8 @@ exports.modifyBook = (req, res, next) => {
             res.status(400).json({ error });
         });
 };
+
+
 
 exports.deleteBook = (req, res, next) => {
     Book.findOne({ _id: req.params.id })
@@ -80,23 +82,28 @@ exports.getBestRate = (req, res, next) => {
 exports.rateBook = (req, res) => {
     Book.findOne({ _id: req.params.id })
         .then(book => {
-            //push le userId et le grade dans le tableau rattings de l'objet book
-            book.ratings.push({
-                userId: req.auth.userId,
-                grade: req.body.rating
-            });
-            let sumGrades = 0
-            //pour chaque index du tableau ratings, on récupère la 'grade' et on l'ajoute à la somme des notes
-            for (let i = 0; i < book.ratings.length; i++) {
-                let indexGrade = book.ratings[i].grade;
-                sumGrades += indexGrade;
+            if (book.ratings.includes(rating => rating.userId == req.body.userId)) {
+                res.status(404).json({ message: 'Vous avez déja noté ce livre' });
+            } else if (1 <= req.body.rating <= 5) {
+                //push le userId et le grade dans le tableau rattings de l'objet book
+                book.ratings.push({
+                    userId: req.auth.userId,
+                    grade: req.body.rating
+                });
+                let sumGrades = 0
+                //pour chaque index du tableau ratings, on récupère la 'grade' et on l'ajoute à la somme des notes
+                for (let i = 0; i < book.ratings.length; i++) {
+                    let indexGrade = book.ratings[i].grade;
+                    sumGrades += indexGrade;
+                }
+                //on actualise la note moyenne en divisant la somme des notes par le nombre de notes dispo dans le tableau
+                book.averageRating = Math.round((sumGrades / book.ratings.length) * 100) / 100;
+                return book.save();
             }
-            //on actualise la note moyenne en divisant la somme des notes par le nombre de notes dispo dans le tableau
-            book.averageRating = sumGrades / book.ratings.length;
-            return book.save();
-
         })
         .then((book) => { res.status(200).json(book); })
         .catch((error) => { res.status(404).json({ error: error }); });
 
+
 };
+
