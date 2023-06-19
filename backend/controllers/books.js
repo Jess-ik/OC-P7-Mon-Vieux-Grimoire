@@ -27,7 +27,7 @@ exports.modifyBook = (req, res, next) => {
         ...JSON.parse(req.body.book),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
-
+    delete bookObject._id;
     delete bookObject._userId;
     Book.findOne({ _id: req.params.id })
         .then((book) => {
@@ -84,7 +84,9 @@ exports.rateBook = (req, res) => {
         .then(book => {
             if (book.ratings.includes(rating => rating.userId == req.body.userId)) {
                 res.status(404).json({ message: 'Vous avez déja noté ce livre' });
-            } else if (1 <= req.body.rating <= 5) {
+            } else if (1 > req.body.rating > 5){
+                res.status(404).json({ message: 'Vous avez déja noté ce livre' });
+            } else {
                 //push le userId et le grade dans le tableau rattings de l'objet book
                 book.ratings.push({
                     userId: req.auth.userId,
