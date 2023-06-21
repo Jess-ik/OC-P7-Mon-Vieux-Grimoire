@@ -1,39 +1,20 @@
 const multer = require('multer');
-const SharpMulter = require("sharp-multer");
 
 const MIME_TYPES = {
   'image/jpg': 'jpg',
   'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp'
+  'image/png': 'png'
 };
 
+const storage = multer.diskStorage({ //Save on disk - config object for multer
+  destination: (req, file, callback) => { // where to save files
+    callback(null, 'images'); //no err, folder name
+  },
+  filename: (req, file, callback) => { //define file name
+    const name = file.originalname.split(' ').join('_').replace(/\.[^.]*$/,''); 
+    const extension = MIME_TYPES[file.mimetype]; // generate file extension
+    callback(null, name + Date.now() + '.' + extension); // +timestamp : unique!
+  }
+});
 
-// const storage = multer.diskStorage({
-//   destination: (req, file, callback) => {
-//     callback(null, 'images');
-//   },
-
-//   filename: (req, file, callback) => {
-//     const name = file.originalname.split(' ').join('_').replace(/\.[^.]+$/, '');
-//     const extension = MIME_TYPES[file.mimetype];
-//     callback(null,  name + '_' + Date.now() + '.' + 'webp');
-//   }
-
-//  });
-
- const storage = SharpMulter({
-  destination: (req, file, callback) => {
-         callback(null, 'images');
-       },
-imageOptions: {
-  fileFormat: "webp",
-    quality: 100,
-    resize: { width: 824, height: 1040, resizeMode:"fill" },
-    useTimestamp: true,
-  },  
- });
- 
-
-module.exports = multer({ storage }).single('image');
-
+module.exports = multer({storage: storage}).single('image'); // img file, unique
