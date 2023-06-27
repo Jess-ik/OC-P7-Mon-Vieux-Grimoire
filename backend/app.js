@@ -64,6 +64,8 @@ app.use(helmet({
 
 //intercepte tout en format json ce qui nous donne le json dans req.body
 app.use(express.json());
+//https://www.npmjs.com/package/express-rate-limit?activeTab=readme
+app.set('trust proxy', 2)
 app.use(mongoSanitize());
 app.use('/images', express.static(path.join(__dirname, 'images')));
 /*app.use('/images', (req, res, next) => {
