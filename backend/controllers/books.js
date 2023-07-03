@@ -4,10 +4,10 @@ const fs = require('fs');
 exports.createBook = (req, res, next) => {
     //on convertit le JSON en objet pour le manipuler dans bookObject
     const bookObject = JSON.parse(req.body.book); 
-    //on supprime l'id généré automatiquement pas mangoDB
+    //on supprime l'id généré automatiquement pas mongoDB
     delete bookObject._id; 
     //on supprime le userId pour des raisons de sécurité et pour éviter toute manipulation non autorisée de cette information lors de la modification du livre
-    delete bookObject._userId; // Don't trust the client !
+    delete bookObject._userId; 
 
     //on crée une nouvelle instance du modele Book
     const book = new Book({
@@ -25,10 +25,10 @@ exports.createBook = (req, res, next) => {
         //on définie la note moyenne qui est = à la note qui vient d'etre donnée (c'est le premier à noter le livre)
         averageRating: bookObject.ratings[0].grade 
     });
-
-    book.save() // save the new book element in db - returns a Promise
-        .then(() => res.status(201).json({ message: "Livre enregistré !" })) // Send succes res
-        .catch(error => res.status(400).json({ error })); // Send error res  
+    //on enregistre le nouveau book
+    book.save() 
+        .then(() => res.status(201).json({ message: "Livre enregistré !" }))
+        .catch(error => res.status(400).json({ error })); 
 };
 
 exports.getOneBook = (req, res, next) => {
