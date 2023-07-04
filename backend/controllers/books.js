@@ -4,8 +4,9 @@ const fs = require('fs');
 exports.createBook = (req, res, next) => {
     //on convertit le JSON en objet pour le manipuler dans bookObject
     const bookObject = JSON.parse(req.body.book); 
-    //on supprime l'id généré automatiquement pas mongoDB
-    delete bookObject._id; 
+    // //on supprime l'id généré automatiquement pas mongoDB
+    // console.log(bookObject)
+    // delete bookObject._id; 
     //on supprime le userId pour des raisons de sécurité et pour éviter toute manipulation non autorisée de cette information lors de la modification du livre
     delete bookObject._userId; 
 
@@ -118,7 +119,7 @@ exports.rateBook = (req, res) => {
     Book.findOne({ _id: req.params.id })
         .then(book => {
             //on vérifie si l'utilisateur a déjà noté le libre
-            if (book.ratings.includes(rating => rating.userId == req.body.userId)) {
+            if (book.ratings.includes(rating => rating.userId == req.auth.userId)) {
                 res.status(404).json({ message: 'Vous avez déja noté ce livre' });
             // on vérifie que la note soit comprise entre 1 et 5
             } else if (1 > req.body.rating > 5) {
