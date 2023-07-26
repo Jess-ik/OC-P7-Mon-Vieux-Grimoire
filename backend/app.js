@@ -40,6 +40,7 @@ app.use(helmet({
   contentSecurityPolicy: true,
   crossOriginEmbedderPolicy: true,
   // crossOriginResourcePolicy: { policy: 'same-site' },
+  crossOriginResourcePolicy: false,
   dnsPrefetchControl: true,
   expectCt: true,
   frameguard: { action: 'deny' },
