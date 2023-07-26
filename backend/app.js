@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 app.use(helmet({
   contentSecurityPolicy: true,
   crossOriginEmbedderPolicy: true,
-  crossOriginResourcePolicy: { policy: 'same-site' },
+  // crossOriginResourcePolicy: { policy: 'same-site' },
   dnsPrefetchControl: true,
   expectCt: true,
   frameguard: { action: 'deny' },

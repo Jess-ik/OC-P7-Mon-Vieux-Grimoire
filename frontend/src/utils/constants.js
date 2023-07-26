@@ -5,6 +5,7 @@ export const API_ROUTES = {
   SIGN_IN: `${API_URL}/api/auth/login`,
   BOOKS: `${API_URL}/api/books`,
   BEST_RATED: `${API_URL}/api/books/bestrating`,
+  IMAGES: `${API_URL}/api/images`,
 };
 
 export const APP_ROUTES = {
